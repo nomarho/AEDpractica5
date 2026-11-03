@@ -90,3 +90,50 @@ dim(clean_iris)
 ```
 Se redujeros las observaciones de 150 a 92
 
+# Ejercicio 4: Estadísticos básicos ------------------------------------------------------------
+
+Empleado la función summarise y across, calcula la media, la desviación típica, mediana, la median absolute deviation from the median (MADM) y el interquartile range (IQR) de las variables numéricas. Hazlo para el data frame con observaciones completas clean_iris (que no tiene NA pero tiene menos observaciones) y para el data frame con datos faltantes dirty_iris (que presenta muchos NA pero tiene todas las observaciones).
+
+Primero definimos la función madm(x) definida como $1.4826 \cdot \text{median}(|x - \text{median}(x)|)$.
+
+
+```{r}
+madm <- function(x) {
+  1.4826 * median(abs(x - median(x, na.rm = TRUE)), na.rm = TRUE)
+}
+
+```
+
+Ahora con summarise y across obtenemos estadísticos (media, desviación típica, mediana, MADM e IQR) a todas las columnas numéricas. Colsutando dispositivas 72 haciadelante del tema5.
+
+```{r}
+
+#con na.rm=TRUE al final da error
+#resumen_dirty <- summarise(dirty_iris,
+ # across(where(is.numeric), list(media = mean, desviacion = sd, mediana = median, madm = madm, iqr = #IQR), na.rm = TRUE))
+
+
+#Estadísticos para clean_iris 
+resumen_clean <- summarise (clean_iris,
+  across(where(is.numeric), list(
+    media = ~ mean(., na.rm = TRUE),
+    desviacion= ~ sd(., na.rm = TRUE),
+    mediana= ~ median(., na.rm = TRUE),
+    madm   = ~ madm(.),
+    iqr = ~ IQR(., na.rm = TRUE))))
+
+#Paradirty_iris 
+resumen_dirty <- summarise(
+  dirty_iris,
+  across(where(is.numeric), list(
+    media = ~ mean(., na.rm = TRUE),
+    desviacion= ~ sd(., na.rm = TRUE),
+    mediana= ~ median(., na.rm = TRUE),
+    madm   = ~ madm(.),
+    iqr = ~ IQR(., na.rm = TRUE))))
+
+# Comparamos los resultados para la variable Petal.Length
+select(resumen_clean, starts_with("Petal.Length"))
+select(resumen_dirty, starts_with("Petal.Length"))
+
+```
