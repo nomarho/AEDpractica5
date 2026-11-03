@@ -137,3 +137,79 @@ select(resumen_clean, starts_with("Petal.Length"))
 select(resumen_dirty, starts_with("Petal.Length"))
 
 ```
+La mediana y madm coinciden mientras que media es muy parecida y sd son ligeramnete diferentes (con clean 2.88, y diry 5.78)
+
+
+# Ejercicio 5: Métodos de detección de outliers -------------------------------------------------------
+
+Escribe una función que detecte los outliers de un vector x para cada uno de los siguientes métodos de detección de outliers univariantes (todas las funciones tienen que ser robustas a la presencia de valores NA).
+
+reglasigma(x):Considera que los datos siguen una distribución gaussiana. Datos típicos caracterizados por la media y la dispersión por la varianza. Valores por encima de 3 desviaciones típicas se consideran outliers.
+
+```{r}
+reglasigma <- function(x) {
+  media <- mean(x, na.rm = TRUE)
+  desv  <- sd(x, na.rm = TRUE)
+  abs(x - media) > 3 * desv
+}
+```
+
+reglahampel(x): Utiliza estimadores robustos y no presupone que los datos siguen una distribución gaussiana. Datos típicos caracterizados por la mediana y la dispersión por la median absolute deviation from the median (MADM). Valores por encima de 3 MADM se consideran outliers.
+
+```{r}
+reglahampel <- function(x) {
+  mediana <- median(x, na.rm = TRUE)
+  dispersion    <- madm(x) 
+  abs(x - mediana) > 3 * dispersion
+}
+```
+
+Regla boxplot reglaboxplot(x): A partir de los datos se calcula su diagrama de caja (boxplot) y se definen como datos típicos superiores hasta el cuartil 75%, xs; datos típicos inferiores hasta el cuartil 25%, xi; y la dispersión se define como el rango intercuartílico (IQR=xs−xi). Valores por encima de xs+1.5IQR o por debajo de xi−1.⋅IQR se consideran outliers. Usa la función quantile para calcular los cuartiles.
+
+```{r}
+reglaboxplot <- function(x) {
+  q1<- quantile(x, prob = 0.25,na.rm = TRUE)
+  q3<- quantile(x, prob = 0.75, na.rm = TRUE)
+  iqr<- q3 - q1
+  x < (q1 - 1.5*iqr)| x > (q3 + 1.5*iqr)
+}
+```
+Percentiles reglapercentil(x): Cualquier valor que esté fuera del rango del percentil 5% y 95% se puede considerar como atípico. Usa la función quantile para calcular los percentiles.
+
+```{r}
+reglapercentil <- function(x) {
+  p5  <- quantile(x, prob = 0.05,na.rm = TRUE)
+  p95 <- quantile(x, prob = 0.95, na.rm = TRUE)
+  x < p5 | x> p95
+}
+
+
+# Probamos con la variable Petal.Length de dirty_iris
+reglasigma(dirty_iris$Petal.Length)
+
+```
+
+# Ejercicio 6: Detección de outliers -------------------------------------------------------
+
+Utiliza la función mutate y across para identificar los outliers en la variable Petal.Length con todos los métodos de detección de outliers implementados. Genera una columna nueva para cada método. Nota: podría extenderse la aplicación a todas las variables numéricas usando también mutate, across y where.
+
+USamos la librería dplyr y mutate() para crear las nuevas columnas y across() para aplicar las cuatro funciones de detección de outliers que definimos en el ejercicio 5.
+
+```{r}
+dirty_iris_outliers <- mutate(dirty_iris,
+  across(
+    Petal.Length,list( sigma = reglasigma,hampel = reglahampel,boxplot= reglaboxplot, percentil = reglapercentil),
+    .names = "{.col}_{.fn}"))
+
+#Visualizamos las columnas creadas
+select(dirty_iris_outliers, Petal.Length, starts_with("Petal.Length_"))
+
+#podemos extender atodas las variables numéricas con where(is.numeric)
+dirty_iris_out <- mutate(dirty_iris,
+  across(where(is.numeric),
+  list( sigma = reglasigma,hampel = reglahampel,boxplot  = reglaboxplot, percentil = reglapercentil),
+    .names = "{.col}_{.fn}"))
+
+```
+
+
