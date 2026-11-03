@@ -32,6 +32,7 @@ A simple vista, el conjunto de datos combina variables numéricas decimales como
 ```{r}
 #Resumen estadístico
 summary(datos)
+dim(datos)
 ```
 El resumen estadístico muestraque los datos están sucios y presentan anomalías  en todas sus variables numéricas. 
 Hay un total de 58 NAs (10 en Sepal.Length, 17 en Sepal.Width, 19 en Petal.Length y 12 en Petal.Width).
@@ -60,5 +61,32 @@ dirty_iris <- mutate(datos,
 #Comprobamos que los NAs han subido
 colSums(is.na(dirty_iris))
 ```
+# Ejercicio 3: Valores perdidos y observaciones completas ---------------------------------------------
 
+Calcula el número y porcentaje de observaciones completas (muestras sin ningún dato perdido) empleando complete.cases (detecta todos los registros sin datos faltantes).
+
+```{r}
+#Calculamos el número y porcentaje de observaciones completas
+completas <- complete.cases(dirty_iris)
+
+num <- sum(completas)
+porcentaje <- mean(completas)*100
+
+# Mostramos resultados
+num
+porcentaje
+cat("Hay", num, "observaciones completas con un porcentaje de", porcentaje, "%")
+```
+Emplea después la función na.omit para quedarnos solo con las filas con datos completos en un nuevo data frame clean_iris.
+
+```{r}
+
+#Creamos un nuevo dataframe con sololas filas completas usando na.omit
+clean_iris <- na.omit(dirty_iris)
+
+#Comprobamos la dimensión del nuevo dataframe
+dim(clean_iris)
+
+```
+Se redujeros las observaciones de 150 a 92
 
