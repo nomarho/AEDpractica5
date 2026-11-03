@@ -1,0 +1,41 @@
+---
+title: "AEDpractica5"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+Práctica 5. Datos Anómalos
+Análisis Exploratorio de Datos, Máster en Ciencia de Datos - UV
+
+# Ejercicio 1: Inspección Visual: ------------------------------------------------------------
+
+Inspecciona visualmente los valores del conjunto de datos (View) y ordena de mayor a menor y de menor a mayor cada variable para descubrir las diferentes inconsistencias que presenta el conjunto dirty_iris. Comenta los valores que te llamen la atención.
+
+```{r}
+# Leemos el archivo utilizando una ruta relativa dentro de tu proyecto
+datos <- read.csv("data/dirty_iris.csv")
+datos
+
+# Visualizamos las primeras filas
+head(datos)
+
+```
+
+```{r}
+#Vemos la estructura (tipo de variable en cada columna etc)
+str(datos)
+```
+A simple vista, el conjunto de datos combina variables numéricas decimales como la longitud (.Length) y el ancho (.Width) tanto del sépalo como del pétalo, con una variable de tipo carácter llamada Species. Se aprecia la presencia de valores faltantes (NAs) en tres de las cuatro variables numéricas, 
+
+```{r}
+#Resumen estadístico
+summary(datos)
+```
+El resumen estadístico muestraque los datos están sucios y presentan anomalías  en todas sus variables numéricas. 
+Hay un total de 58 NAs (10 en Sepal.Length, 17 en Sepal.Width, 19 en Petal.Length y 12 en Petal.Width).
+También se ve que los máximo están alejados de la realidad, por ejemplo en Sepal.Length está en 73 y Sepal.Width en 30, imposible si el resto de sus valores rondan los 3 o 5 centímetros.
+Además, la variable Petal.Width presenta tanto en su media (Mean) como su valor máximo (Max.) un infinito (Inf).
+Por otro lado vemos en Sepal.Width un ancho mínimo negativo de -3.000, y en su longitud un 0.
+
