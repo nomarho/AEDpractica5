@@ -213,3 +213,68 @@ dirty_iris_out <- mutate(dirty_iris,
 ```
 
 
+# Ejercicio 7: Comparativa de los métodos de detección de outliers------------------------------------
+
+En los métodos de detección de outliers analizados, examina los resultados comparando:
+Número de outliers detectados por método.
+
+```{r}
+conteo_outliers <- summarise(dirty_iris_outliers,
+  across(
+    starts_with("Petal.Length_"),
+    ~ sum(., na.rm = TRUE)))
+```
+
+
+```{r}
+print(conteo_outliers)
+```
+
+Los valores etiquetados como outliers (ordenados de menor a mayor).
+
+```{r}
+#Para sigma
+outliers_sigma <- dirty_iris_outliers %>%
+  filter(Petal.Length_sigma == TRUE) %>%
+  select(Petal.Length) %>%
+  arrange(Petal.Length)
+outliers_sigma
+
+# Para Hampel 
+outliers_hampel <- dirty_iris_outliers %>%
+  filter(Petal.Length_hampel == TRUE) %>%
+  select(Petal.Length) %>%
+  arrange(Petal.Length)
+outliers_hampel
+
+#análogo para los otros dos
+```
+# Ejercicio 8: 
+
+```{r}
+
+library(tidyr)
+library(ggplot2)
+
+#Transformamos el data frame a formato largo con pivot_longer
+dirty_iris_long <- dirty_iris_outliers %>%
+  pivot_longer(
+    cols = starts_with("Petal.Length_"),
+    names_to = "metodo",
+    values_to = "es_outlier"
+  ) %>%
+  mutate(metodo = sub("Petal.Length_", "", metodo))
+
+#Representación gráfica con ggplot2
+ggplot(dirty_iris_long, aes(x = metodo, y = Petal.Length, color = es_outlier)) +
+  geom_point(position = position_jitter(width = 0.2, height = 0), alpha = 0.7) +
+  scale_color_manual(values = c("FALSE" = "steelblue", "TRUE" = "red"),
+                     labels = c("FALSE" = "Típico", "TRUE" = "Outlier")) +
+  labs(title = "Comparativa de Detección de Outliers en Petal.Length",
+    subtitle = "Distintos métodos univariantes",
+    x = "Método de Detección",
+    y = "Petal.Length (cm)",
+    color = "Tipo de Dato") +theme_minimal()
+
+```
+
