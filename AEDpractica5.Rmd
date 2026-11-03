@@ -39,3 +39,26 @@ También se ve que los máximo están alejados de la realidad, por ejemplo en Se
 Además, la variable Petal.Width presenta tanto en su media (Mean) como su valor máximo (Max.) un infinito (Inf).
 Por otro lado vemos en Sepal.Width un ancho mínimo negativo de -3.000, y en su longitud un 0.
 
+
+# Ejercicio 2: Valores especiales ------------------------------------------------------------
+
+Reemplaza, en todas las columnas numéricas del data frame dirty_iris, los valores que sean especiales (usando is.finite), negativos, o iguales a cero, por NA. Nota: Puedes reemplazar los valores para cada variable del dataframe usando mutate con la función ifelse.
+
+```{r}
+library(dplyr)
+
+# Reemplazamos valores especiales como el infinito,
+# negativos o ceros por NA usando mutate de dplyr 
+# y la estructura condicional ifelse(condicion, NA, nombre columna)
+
+dirty_iris <- mutate(datos,
+  Sepal.Length = ifelse(!is.finite(Sepal.Length) | Sepal.Length <= 0, NA, Sepal.Length),
+  Sepal.Width  = ifelse(!is.finite(Sepal.Width)  | Sepal.Width  <= 0, NA, Sepal.Width),
+  Petal.Length = ifelse(!is.finite(Petal.Length) | Petal.Length <= 0, NA, Petal.Length),
+  Petal.Width  = ifelse(!is.finite(Petal.Width)  | Petal.Width  <= 0, NA, Petal.Width))
+
+#Comprobamos que los NAs han subido
+colSums(is.na(dirty_iris))
+```
+
+
